@@ -1,0 +1,1 @@
+plate_detection.m is the main file. (The one that you open and run in matlab)
