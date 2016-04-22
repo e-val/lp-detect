@@ -1,13 +1,17 @@
 function [result, regions] = perform_image_preprocessing(img)
+
+    sharpened = img + 4*(img - imfilter(img, fspecial('gaussian', 50, 3), 'symmetric'));
+
+    img = sharpened;
+    
     bot = imbothat(rgb2gray(img), strel(ones(60, 60)));
-    top = imtophat(rgb2gray(img), strel(ones(20, 20)));
+    top = imtophat(rgb2gray(img), strel(ones(60, 60)));
 
     topBin = imbinarize(top, 'global');
     botBin = imbinarize(bot, 'global');
     
     result = botBin - topBin;
     result(result == -1) = 0;
-    
     
     %Show result before pruning of image regions
     %figure;imshow(result);

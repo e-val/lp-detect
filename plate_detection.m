@@ -35,5 +35,4 @@ scale = get_training_scale_for_lp(lp_data(imgNr));
 figure;imshow(plot_regions_on_image(im2double(preProcessedImage), regions));
 
 % View the original scaled image
-%imtool(scaledIm);
-
+imtool(scaledIm);
