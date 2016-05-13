@@ -14,7 +14,7 @@ load([lpDatasetPath '/lp_data']);
 % function load_training_image(index) loads an image with the corresponding index.
 %
 % function get_training_scale_for_lp(lp) takes an object from the lp_data array and returns the 
-% correct scale that should be used when detecting the licence plate.
+% correct scale that should be used when detecting the licence plate. (Used for testing)
 %
 % function pyramid_scale(image, boundingBox, scale) scales the corresponding image and boundingbox.
 % 
@@ -28,11 +28,16 @@ im = load_training_image(imgNr);
 scale = get_training_scale_for_lp(lp_data(imgNr));
 [scaledIm, scaledBoundingBox] = pyramid_scale(im, lp_data(imgNr).boundingBox, scale);
 
-% This is where the magic happens..
+
 [preProcessedImage, regions] = perform_image_preprocessing(scaledIm);
 
+characterRegions = find_characters(regions);
+
+trueClasses = get_region_true_classes(scaledBoundingBox, lp_data(imgNr).regNr, regions);
+
+
 % View the result
-figure;imshow(plot_regions_on_image(im2double(preProcessedImage), regions));
+figure;imshow(plot_regions_on_image(im2double(preProcessedImage), regions, trueClasses, scaledBoundingBox));
 
 % View the original scaled image
-imtool(scaledIm);
+%imtool(preProcessedImage);

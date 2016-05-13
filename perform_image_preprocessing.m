@@ -1,6 +1,6 @@
 function [result, regions] = perform_image_preprocessing(img)
 
-    sharpened = img + 4*(img - imfilter(img, fspecial('gaussian', 50, 3), 'symmetric'));
+    sharpened = img + 4*(img - imfilter(img, fspecial('gaussian', 21, 3), 'symmetric'));
 
     img = sharpened;
     
@@ -71,14 +71,13 @@ end
 
 function regions = merge_bounding_boxes(img, bboxes)
 
-    % Convert from the [x y width height] bounding box format to the [xmin ymin
-    % xmax ymax] format for convenience.
     lastNumBoundingBoxes = 0;
     currNumBoundingBoxes = size(bboxes, 1);
     
     while(lastNumBoundingBoxes ~= currNumBoundingBoxes)
         
-        
+        % Convert from the [x y width height] bounding box format to the [xmin ymin
+        % xmax ymax] format for convenience.
         xmin = bboxes(:,1);
         ymin = bboxes(:,2);
         xmax = xmin + bboxes(:,3) - 1;
