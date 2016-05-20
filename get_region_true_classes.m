@@ -14,7 +14,7 @@ function trueClasses = get_region_true_classes(boundingBox, regNr, allRegions)
         
         
         regionsInBoundingBoxIndices = (overlapRatio > 0.95);
-        
+      
         charRegionIndices = getCharRegionsBasedOnSize(allRegions, regionsInBoundingBoxIndices);
 
         %Atleast some characters were segmented
@@ -44,14 +44,8 @@ function trueClasses = get_region_true_classes(boundingBox, regNr, allRegions)
                     trueClasses(charRegionIndices(i)) = find(charClasses == regNr(currPos));
                     currPos = currPos + 1;
                 elseif minPos < maxPos
-                    if currPos == 1
-                        charDistance = allRegions(charRegionIndices(i), 1) - boundingBox(1);
-                        num = 1 + round(double(charDistance)/double(avgCharWidth));
-                    else
-                        charDistance = allRegions(charRegionIndices(i), 1) - allRegions(charRegionIndices(i-1), 1);
-                        num = round(double(charDistance)/double(avgCharWidth));
-                    end
-                    
+                    charDistance = allRegions(charRegionIndices(i), 1) - boundingBox(1);
+                    num = round(double(charDistance)/double(avgCharWidth));          
                     num = max(minPos, min(maxPos, num));
                     
                     trueClasses(charRegionIndices(i)) = find(charClasses == regNr(num));
@@ -65,18 +59,18 @@ function trueClasses = get_region_true_classes(boundingBox, regNr, allRegions)
 end
 
 function charRegionIndices = getCharRegionsBasedOnSize(regions, regionsInBoundingBoxIndices)
-    heightMargin = 4;
+    heightMargin = 3;
     charRegionIndices = [];
     
     regionsInBoundingBoxIndices = find(regionsInBoundingBoxIndices);
     
-    for i = regionsInBoundingBoxIndices
+    for i = regionsInBoundingBoxIndices'
 
             currHeight = regions(i, 4);  
 
-            curr = find((regions(regionsInBoundingBoxIndices, 4) <= currHeight + heightMargin) ...
-                   & (regions(regionsInBoundingBoxIndices, 4) >= currHeight - heightMargin));
-
+            curr = find((regions(regionsInBoundingBoxIndices, 4) < currHeight + heightMargin) ...
+                   & (regions(regionsInBoundingBoxIndices, 4) > currHeight - heightMargin));
+            
             if size(curr, 1) > size(charRegionIndices, 1)
                 charRegionIndices = regionsInBoundingBoxIndices(curr);
             end

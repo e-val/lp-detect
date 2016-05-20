@@ -3,47 +3,34 @@ function [inputs, targets] = create_training_data(height, width)
     global charDatasetPath;
     
     charClasses = 'ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789';
-    bgClass = length(charClasses) + 1;
+    fileIndexToClassMap = 'ABCDEFGHJKLMNOPQRSTUVWXYZ01234567893469';
     
-    numCharClasses = length(charClasses);
+    %bgClass = length(charClasses) + 1;
     
-    inputs = zeros(numCharClasses, width*height);
-    targets = zeros(numCharClasses, numCharClasses);
+    numOutputClasses = length(charClasses);
+    numSamples = length(fileIndexToClassMap);
     
-    for i = 1:length(charClasses)
+    inputs = zeros(numSamples, width*height);
+    targets = zeros(numSamples, numOutputClasses);
+    
+    for i = 1:length(fileIndexToClassMap)
         charIm = im2double(imread(sprintf('%schar-%02d.png', charDatasetPath, i)));
-        scaledCharIm = imresize(charIm, [height width]);
+        imBw = im2double(imbinarize(charIm, 'global'));
+        
+        scaledCharIm = scaleImToSize(imBw, height, width);
         
         inputs(i, :) = imToCol(scaledCharIm);
-        targets(i, :) = createTargetVectorForClass(i, numCharClasses);
-        
+        targets(i, :) = createTargetVectorForClass(find(charClasses == fileIndexToClassMap(i)), numOutputClasses);    
     end
+    
 end
 
 
 function colIm = imToCol(Im)
-    colIm = reshape(imbinarize(Im, 'global'), 1, []);
+    colIm = reshape(Im, 1, []);
 end
 
 function target = createTargetVectorForClass(index, numClasses)
     target = zeros(1, numClasses);
     target(index) = 1;
-end
-
-function scaledIm = scaleImToSize(Im, height, width)
-    
-    scaledIm = imresize(Im, [height NaN]);
-    
-    currWidth = size(scaledIm, 2);
-    
-    if currWidth > width
-        scaledIm = imresize(Im, [height width]);
-    elseif currWidth < width
-        padVal = (width-size(scaledIm, 2))/double(2);
-        sl = ceil(padVal);
-        sr = floor(padVal);
-        scaledIm = padarray(scaledIm, [0 sl], 0, 'pre');
-        scaledIm = padarray(scaledIm, [0 sr], 0, 'post');
-    end
-    
 end
